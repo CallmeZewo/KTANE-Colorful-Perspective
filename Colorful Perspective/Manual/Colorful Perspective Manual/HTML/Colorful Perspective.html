@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -8,13 +8,28 @@
     <link rel="stylesheet" type="text/css" href="css/normalize.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
     <script src="js/ktane-utils.js"></script>
+    <script>
+        let rotationDegree = 0;
+
+        function rotateTable(direction) {
+            if (direction == 'clockwise') {
+                rotationDegree += 90;
+            } else if (direction == 'counterclockwise') {
+                rotationDegree -= 90;
+            } else if (direction == 'reset') {
+                rotationDegree = 0;
+            }
+
+            document.getElementById('rotate-table').style.transform = `rotate(${rotationDegree}deg)`
+        }
+    </script>
     <style>
         .dark table, table {
             margin: 1em auto;
             border: none;
             text-align: center;
         }
-
+        
         .buttons { text-align: center; }
 
         .dark thead td, thead td {
@@ -76,7 +91,7 @@
                 </p>
                 <h3>Starting current color</h3>
                 <table class="color">
-                     <thead>
+                    <thead>
                         <tr>
                             <td colspan="2" rowspan="2"></td>
                             <th colspan="2">Sum of 3. and 6. Serialnumber digits</th>
@@ -116,12 +131,12 @@
                     Otherwise, look at the last matching color on the left face instead. If no color matches, start on the front face.<sup>[1]</sup>
                 </p>
                 <h3>Arrow table</h3>
-                    <table class="arrow", "rotate-table" id = "rotate-table">
-                        <tr><td class="blue">&rarr;</td><td class="green">&uarr;</td><td class="yellow">&larr;</td><td class="white">&darr;</td></tr>
-                        <tr><td class="red">&darr;</td><td class="cyan">&rarr;</td><td class="black">&uarr;</td><td class="magenta">&larr;</td></tr>
-                        <tr><td class="magenta">&uarr;</td><td class="blue">&darr;</td><td class="red">&larr;</td><td class="white">&rarr;</td></tr>
-                        <tr><td class="black">&rarr;</td><td class="yellow">&uarr;</td><td class="cyan">&darr;</td><td class="green">&larr;</td></tr>
-                    </table>
+                <table class="arrow", "rotate-table" id = "rotate-table">
+                    <tr><td class="blue">&rarr;</td><td class="green">&uarr;</td><td class="yellow">&larr;</td><td class="white">&darr;</td></tr>
+                    <tr><td class="red">&darr;</td><td class="cyan">&rarr;</td><td class="black">&uarr;</td><td class="magenta">&larr;</td></tr>
+                    <tr><td class="magenta">&uarr;</td><td class="blue">&darr;</td><td class="red">&larr;</td><td class="white">&rarr;</td></tr>
+                    <tr><td class="black">&rarr;</td><td class="yellow">&uarr;</td><td class="cyan">&darr;</td><td class="green">&larr;</td></tr>
+                </table>
                 <div class="buttons">
                     <button onclick="rotateTable('clockwise')">Rotate Clockwise</button>
                     <button onclick="rotateTable('counterclockwise')">Rotate Counterclockwise</button>
@@ -169,20 +184,5 @@
             <div class="page-footer relative-footer">2</div>
         </div>
     </div>
-    <script>
-        let rotationDegree = 0;
-
-        function rotateTable(direction) {
-            if (direction == 'clockwise') {
-                rotationDegree += 90;
-            } else if (direction == 'counterclockwise') {
-                rotationDegree -= 90;
-            } else if (direction == 'reset') {
-                rotationDegree = 0;
-            }
-
-            document.getElementById('rotate-table').style.transform = `rotate(${rotationDegree}deg)`
-        }
-    </script>
 </body>
 </html>

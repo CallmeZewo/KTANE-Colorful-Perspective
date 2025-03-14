@@ -22,15 +22,20 @@ public class ColorfulPerspective : MonoBehaviour
 
     KMSelectable[,,] CubeGrid = new KMSelectable[4, 4, 4];
 
+    bool IsCubeAmountPressedEven;
+
     int FirstSerialNumberDigit;
     int ThirdAndSixthSerialNumberDigit;
     int BatteryHolder;
-    int PressedCubes = 0;
+    int PressCubeAmount = 0;
+    int CurrentTableRotation = 0;
 
     string CurrentFacePerspective;
     string NextFacePerspective;
 
     Material CurrentColor;
+
+    List<int> CurrentPressedCubeIndexList = new List<int>();
 
     List<string> CurrentFaceCubeNames = new List<string>();
     List<Material> CurrentFaceColors = new List<Material>();
@@ -52,6 +57,18 @@ public class ColorfulPerspective : MonoBehaviour
     static int ModuleIdCounter = 1;
     int ModuleId;
     private bool ModuleSolved;
+
+    public class RGB
+    {
+        public bool r, g, b;
+
+        public RGB(bool r, bool g, bool b)
+        {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+        }
+    }
 
     void Awake()
     { //Avoid doing calculations in here regarding edgework. Just use this for setting up buttons for simplicity.
@@ -169,6 +186,13 @@ public class ColorfulPerspective : MonoBehaviour
         GetCorrectCubeList();
     }
 
+    void MainGameplayLoop()
+    {
+        HandleColorAndPerspectiveChange();
+        GetCurrentPerspectiveColors();
+        GetCorrectCubeList();
+    }
+
     #region Setup Methodes
 
     void SetRandomCubeColor()
@@ -216,19 +240,34 @@ public class ColorfulPerspective : MonoBehaviour
 
     void GetStartingPerspective()
     {   
+        int matchingColorIndex = -1;
         if (FirstSerialNumberDigit % 2 == 0)
         {
             GetFaceRight();
+            for (int i = 0; i < CurrentFaceColors.Count; i++)
+            {
+                if (CurrentFaceColors[i].color == TableColors0[i].color)
+                {
+                    matchingColorIndex = i;
+                    break;
+                }
+            }
         }
         else
         {
             GetFaceLeft();
-            CurrentFaceColors.Reverse();
+            for (int i = CurrentFaceColors.Count - 1; i >= 0; i--)
+            {
+                if (CurrentFaceColors[i].color == TableColors0[i].color)
+                {
+                    matchingColorIndex = i;
+                    break;
+                }
+            }
         }
-
-        int matchingColorIndex = CurrentFaceColors.FindIndex(color => TableColors0.Any(material => material.color == color.color));
         if (matchingColorIndex != -1) CurrentFacePerspective = TablePerspective0[matchingColorIndex];
         else CurrentFacePerspective = "Front";
+        GetCurrentPerspectiveColors();
         Debug.LogFormat("[Colorful Perspective #{0}] Starting Perspective {1}", ModuleId, CurrentFacePerspective);
     }
 
@@ -282,10 +321,32 @@ public class ColorfulPerspective : MonoBehaviour
 
     #region Get Face Colors into List
 
+    void GetCurrentPerspectiveColors()
+    {
+        switch (CurrentFacePerspective)
+        {
+            case "Left":
+                GetFaceLeft();
+                break;
+            case "Down":
+                GetFaceDown();
+                break;
+            case "Front":
+                GetFaceFront();
+                break;
+            case "Up":
+                GetFaceUp();
+                break;
+            case "Right":
+                GetFaceRight();
+                break;
+        }
+    }
+
     void GetFaceLeft()
     {
-        CurrentFaceCubeNames.Clear();
         CurrentFaceColors.Clear();
+        CurrentFaceCubeNames.Clear();
         for (int z = 3; z >= 0; z--)
         {
             for (int y = 0; y < 4; y++)
@@ -429,10 +490,93 @@ public class ColorfulPerspective : MonoBehaviour
 
     #endregion
 
-    #region Direction Changes
+    #region Direction and Color Changes
 
-    void HandleDirectionChange()
+    void HandleColorAndPerspectiveChange()
     {
+        RGB NextColor = new RGB((int)CurrentColor.color.r == 1, (int)CurrentColor.color.g == 1, (int)CurrentColor.color.b == 1);
+
+        foreach (int index in CurrentPressedCubeIndexList)
+        {
+            if (CurrentTableRotation == 0)
+            {
+                if ((int)TableColors0[index].color.r == 1) NextColor.r = !NextColor.r;
+                if ((int)TableColors0[index].color.g == 1) NextColor.g = !NextColor.g;
+                if ((int)TableColors0[index].color.b == 1) NextColor.b = !NextColor.b;
+                NextFacePerspective = TablePerspective0[index];
+            }
+            else if (CurrentTableRotation == 1)
+            {
+                if ((int)TableColors90[index].color.r == 1) NextColor.r = !NextColor.r;
+                if ((int)TableColors90[index].color.g == 1) NextColor.g = !NextColor.g;
+                if ((int)TableColors90[index].color.b == 1) NextColor.b = !NextColor.b;
+                NextFacePerspective = TablePerspective90[index];
+            }
+            else if (CurrentTableRotation == 2)
+            {
+                if ((int)TableColors180[index].color.r == 1) NextColor.r = !NextColor.r;
+                if ((int)TableColors180[index].color.g == 1) NextColor.g = !NextColor.g;
+                if ((int)TableColors180[index].color.b == 1) NextColor.b = !NextColor.b;
+                NextFacePerspective = TablePerspective180[index];
+            }
+            else
+            {
+                if ((int)TableColors270[index].color.r == 1) NextColor.r = !NextColor.r;
+                if ((int)TableColors270[index].color.g == 1) NextColor.g = !NextColor.g;
+                if ((int)TableColors270[index].color.b == 1) NextColor.b = !NextColor.b;
+                NextFacePerspective = TablePerspective270[index];
+            }
+            HandlePerspectiveChange();
+        }
+
+        if (!IsCubeAmountPressedEven)
+        {
+            NextColor.r = !NextColor.r;
+            NextColor.g = !NextColor.g;
+            NextColor.b = !NextColor.b;
+        }
+
+        Dictionary<int, int> lookupTableNewColor = new Dictionary<int, int>
+        {
+            { 0, 0 }, //Black
+            { 100, 1 }, //Red
+            { 10, 2 }, //Green
+            { 1, 3 }, //Blue
+            { 11, 4 }, //Cyan
+            { 101, 5 }, //Magenta
+            { 110, 6 }, //Yellow
+            { 111, 7 }, //White
+        };
+
+        int key = (NextColor.r ? 100 : 0) + (NextColor.g ? 10 : 0) + (NextColor.b ? 1 : 0);
+        CurrentColor = CubeColors[lookupTableNewColor[key]];
+        Debug.LogFormat("[Colorful Perspective #{0}] New Color is: {1}", ModuleId, CurrentColor.color);
+        Debug.LogFormat("[Colorful Perspective #{0}] New Perspective is: {1}", ModuleId, CurrentFacePerspective);
+
+        CurrentPressedCubeIndexList.Clear();
+    }
+
+    void HandlePerspectiveChange()
+    {
+        if (!IsCubeAmountPressedEven)
+        {
+            switch (NextFacePerspective)
+            {
+                case "Left":
+                    NextFacePerspective = "Right";
+                    break;
+                case "Right":
+                    NextFacePerspective = "Left";
+                    break;
+                case "Up":
+                    NextFacePerspective = "Down";
+                    break;
+                case "Down":
+                    NextFacePerspective = "Up";
+                    break;
+            }
+        }
+
         Dictionary<string, string> DirectionTransitions = new Dictionary<string, string>
         {
             { "LeftLeft", "Right" },
@@ -446,6 +590,10 @@ public class ColorfulPerspective : MonoBehaviour
         };
 
         string key = CurrentFacePerspective + NextFacePerspective;
+        if (key == "LeftLeft" || key == "Right Right" || key == "UpUp" || key == "DownDown")
+        {
+            if (IsCubeAmountPressedEven) CurrentTableRotation++; else CurrentTableRotation += 3;
+        }
         if (DirectionTransitions.ContainsKey(key))
         {
             CurrentFacePerspective = DirectionTransitions[key];
@@ -457,6 +605,8 @@ public class ColorfulPerspective : MonoBehaviour
     }
 
     #endregion
+
+    #region Prepare Cubes to press
 
     void GetCorrectCubeList()
     {
@@ -477,13 +627,21 @@ public class ColorfulPerspective : MonoBehaviour
         string[] correctCubeNames = CorrectCubes.Select(cube => cube.name).ToArray();
 
         Debug.LogFormat("[Colorful Perspective #{0}] Correct Cubes for this Perspective: {1}", ModuleId, string.Join(", ", correctCubeNames).ToString());
+
+        if (CorrectCubes.Count % 2 == 0)
+        {
+            IsCubeAmountPressedEven = true;
+        }
+        else
+        {
+            IsCubeAmountPressedEven = false;
+        }
     }
 
     void ColorNotOnFaceFallback()
     {
         foreach (Material color in CubeColors)
         {
-            Debug.Log(CurrentFaceColors.Any(material => material.color == color.color));
             if (CurrentFaceColors.Any(material => material.color == color.color))
             {
                 Debug.LogFormat("[Colorful Perspective #{0}] Color not present on {1} face, changed color to {2}", ModuleId, CurrentFacePerspective, color.name);
@@ -493,19 +651,31 @@ public class ColorfulPerspective : MonoBehaviour
         }
     }
 
+    #endregion
+
     void InputHandler(KMSelectable cube)
     {
         int cubeIndex = Array.IndexOf(CubesInteractable, cube);
         if (CorrectCubes.Contains(CubesInteractable[cubeIndex]))
         {
-            CorrectCubes.RemoveAt(0);
+            CurrentPressedCubeIndexList.Add(CurrentFaceCubeNames.FindIndex(name => name == CubesInteractable[cubeIndex].gameObject.name));
+            CorrectCubes.Remove(CubesInteractable[cubeIndex]);
             CubesInteractable[cubeIndex].gameObject.SetActive(false);
-            PressedCubes++;
+            PressCubeAmount++;
+        }
+        else
+        {
+            Strike();
         }
 
-        if (CorrectCubes.Count == PressedCubes)
+        if (PressCubeAmount == 64)
         {
-            PressedCubes = 0;
+            Solve();
+        }
+
+        if (CorrectCubes.Count == 0)
+        {
+            MainGameplayLoop();
         }
     }
 
