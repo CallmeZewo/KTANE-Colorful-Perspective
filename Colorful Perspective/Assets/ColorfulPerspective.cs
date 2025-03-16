@@ -550,7 +550,7 @@ public class ColorfulPerspective : MonoBehaviour
 
         int key = (NextColor.r ? 100 : 0) + (NextColor.g ? 10 : 0) + (NextColor.b ? 1 : 0);
         CurrentColor = CubeColors[lookupTableNewColor[key]];
-        Debug.LogFormat("[Colorful Perspective #{0}] New Color is: {1}", ModuleId, CurrentColor.color);
+        Debug.LogFormat("[Colorful Perspective #{0}] New Color is: {1}", ModuleId, CurrentColor.name);
         Debug.LogFormat("[Colorful Perspective #{0}] New Perspective is: {1}", ModuleId, CurrentFacePerspective);
 
         CurrentPressedCubeIndexList.Clear();
@@ -558,7 +558,8 @@ public class ColorfulPerspective : MonoBehaviour
 
     void HandlePerspectiveChange()
     {
-        if (!IsCubeAmountPressedEven)
+        Debug.Log(NextFacePerspective);
+        if (IsCubeAmountPressedEven)
         {
             switch (NextFacePerspective)
             {
@@ -590,7 +591,7 @@ public class ColorfulPerspective : MonoBehaviour
         };
 
         string key = CurrentFacePerspective + NextFacePerspective;
-        if (key == "LeftLeft" || key == "Right Right" || key == "UpUp" || key == "DownDown")
+        if (key == "LeftLeft" || key == "RightRight" || key == "UpUp" || key == "DownDown")
         {
             if (IsCubeAmountPressedEven) CurrentTableRotation++; else CurrentTableRotation += 3;
         }
