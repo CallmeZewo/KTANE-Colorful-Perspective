@@ -558,7 +558,6 @@ public class ColorfulPerspective : MonoBehaviour
 
     void HandlePerspectiveChange()
     {
-        Debug.Log(NextFacePerspective);
         if (IsCubeAmountPressedEven)
         {
             switch (NextFacePerspective)
@@ -656,6 +655,8 @@ public class ColorfulPerspective : MonoBehaviour
 
     void InputHandler(KMSelectable cube)
     {
+        cube.AddInteractionPunch();
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, cube.transform);
         int cubeIndex = Array.IndexOf(CubesInteractable, cube);
         if (CorrectCubes.Contains(CubesInteractable[cubeIndex]))
         {

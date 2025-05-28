@@ -14,10 +14,11 @@ MonoBehaviour:
   id: ColorfulPerspective
   title: Colorful Perspective
   author: CallmeZero
-  description: '(DESCRIPTION)
+  description: 'I hope you are familiar with color theory. Determine Perspective and
+    color to decimate the Cubes!
 
 
     The manual can be found in the manuals folder of the game or at ktane.timwi.de.'
-  version: 1.0.0
+  version: 1.0.1
   outputFolder: build
-  previewImage: {fileID: 0}
+  previewImage: {fileID: 2800000, guid: eb67d71d98298ae41b2452ea63d772da, type: 3}
