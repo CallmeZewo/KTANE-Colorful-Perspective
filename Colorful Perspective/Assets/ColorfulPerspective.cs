@@ -30,8 +30,8 @@ public class ColorfulPerspective : MonoBehaviour
     int PressCubeAmount = 0;
     int CurrentTableRotation = 0;
 
-    string CurrentFacePerspective;
-    string NextFacePerspective;
+    Direction CurrentFacePerspective;
+    Direction NextFacePerspective;
 
     Material CurrentColor;
 
@@ -40,16 +40,16 @@ public class ColorfulPerspective : MonoBehaviour
     List<string> CurrentFaceCubeNames = new List<string>();
     List<Material> CurrentFaceColors = new List<Material>();
 
-    List<string> TablePerspective0;
+    List<Direction> TablePerspective0;
     List<Material> TableColors0;
 
-    List<string> TablePerspective90;
+    List<Direction> TablePerspective90;
     List<Material> TableColors90;
 
-    List<string> TablePerspective180;
+    List<Direction> TablePerspective180;
     List<Material> TableColors180;
 
-    List<string> TablePerspective270;
+    List<Direction> TablePerspective270;
     List<Material> TableColors270;
 
     List<KMSelectable> CorrectCubes = new List<KMSelectable>();
@@ -57,6 +57,28 @@ public class ColorfulPerspective : MonoBehaviour
     static int ModuleIdCounter = 1;
     int ModuleId;
     private bool ModuleSolved;
+
+
+    public enum Direction
+    {
+        Front,
+        Left,
+        Right,
+        Up,
+        Down
+    }
+
+    public enum CubeColor
+    {
+        Black = 0,
+        Red = 1,
+        Green = 2,
+        Blue = 3,
+        Cyan = 4,
+        Magenta = 5,
+        Yellow = 6,
+        White = 7
+    }
 
     public class RGB
     {
@@ -94,69 +116,73 @@ public class ColorfulPerspective : MonoBehaviour
     { //Shit that you calculate, usually a majority if not all of the module
 
         #region Arrow table
-
-        TablePerspective0 = new List<string>
+        Func<CubeColor, Material> M = delegate (CubeColor c)
         {
-            "Right", "Up", "Left", "Down",
-            "Down", "Right", "Up", "Left",
-            "Up", "Down", "Left", "Right",
-            "Right", "Up", "Down", "Left",
+            return (CubeColors[(int)c]);
+        };
+
+        TablePerspective0 = new List<Direction>
+        {
+            Direction.Right, Direction.Up, Direction.Left, Direction.Down,
+            Direction.Down, Direction.Right, Direction.Up, Direction.Left,
+            Direction.Up, Direction.Down, Direction.Left, Direction.Right,
+            Direction.Right, Direction.Up, Direction.Down, Direction.Left,
         };
 
         TableColors0 = new List<Material>
         {
-            CubeColors[3], CubeColors[2], CubeColors[6], CubeColors[7],
-            CubeColors[1], CubeColors[4], CubeColors[0], CubeColors[5],
-            CubeColors[5], CubeColors[3], CubeColors[1], CubeColors[7],
-            CubeColors[0], CubeColors[6], CubeColors[4], CubeColors[2],
+            M(CubeColor.Blue), M(CubeColor.Green), M(CubeColor.Yellow), M(CubeColor.White),
+            M(CubeColor.Red), M(CubeColor.Cyan), M(CubeColor.Black), M(CubeColor.Magenta),
+            M(CubeColor.Magenta), M(CubeColor.Blue), M(CubeColor.Red), M(CubeColor.White),
+            M(CubeColor.Black), M(CubeColor.Yellow), M(CubeColor.Cyan), M(CubeColor.Green),
         };
 
-        TablePerspective90 = new List<string>
+        TablePerspective90 = new List<Direction>
         {
-            "Down", "Right", "Left", "Down",
-            "Right", "Left", "Down", "Right",
-            "Left", "Up", "Right", "Up",
-            "Up", "Down", "Up", "Left",
+            Direction.Down, Direction.Right, Direction.Left, Direction.Down,
+            Direction.Right, Direction.Left, Direction.Down, Direction.Right,
+            Direction.Left, Direction.Up, Direction.Right, Direction.Up,
+            Direction.Up, Direction.Down, Direction.Up, Direction.Left,
         };
 
         TableColors90 = new List<Material>
         {
-            CubeColors[0], CubeColors[5], CubeColors[1], CubeColors[3],
-            CubeColors[6], CubeColors[3], CubeColors[4], CubeColors[2],
-            CubeColors[4], CubeColors[1], CubeColors[0], CubeColors[6],
-            CubeColors[2], CubeColors[7], CubeColors[5], CubeColors[7],
+            M(CubeColor.Black), M(CubeColor.Magenta), M(CubeColor.Red), M(CubeColor.Blue),
+            M(CubeColor.Yellow), M(CubeColor.Blue), M(CubeColor.Cyan), M(CubeColor.Green),
+            M(CubeColor.Cyan), M(CubeColor.Red), M(CubeColor.Black), M(CubeColor.Yellow),
+            M(CubeColor.Green), M(CubeColor.White), M(CubeColor.Magenta), M(CubeColor.White),
         };
 
-        TablePerspective180 = new List<string>
+        TablePerspective180 = new List<Direction>
         {
-            "Right", "Up", "Down", "Left",
-            "Left", "Right", "Up", "Down",
-            "Right", "Down", "Left", "Up",
-            "Up", "Right", "Down", "Left",
+            Direction.Right, Direction.Up, Direction.Down, Direction.Left,
+            Direction.Left, Direction.Right, Direction.Up, Direction.Down,
+            Direction.Right, Direction.Down, Direction.Left, Direction.Up,
+            Direction.Up, Direction.Right, Direction.Down, Direction.Left,
         };
 
         TableColors180 = new List<Material>
         {
-            CubeColors[2], CubeColors[4], CubeColors[6], CubeColors[0],
-            CubeColors[7], CubeColors[1], CubeColors[3], CubeColors[5],
-            CubeColors[5], CubeColors[0], CubeColors[4], CubeColors[1],
-            CubeColors[7], CubeColors[6], CubeColors[2], CubeColors[3],
+            M(CubeColor.Green), M(CubeColor.Cyan), M(CubeColor.Yellow), M(CubeColor.Black),
+            M(CubeColor.White), M(CubeColor.Red), M(CubeColor.Blue), M(CubeColor.Magenta),
+            M(CubeColor.Magenta), M(CubeColor.Black), M(CubeColor.Cyan), M(CubeColor.Red),
+            M(CubeColor.White), M(CubeColor.Yellow), M(CubeColor.Green), M(CubeColor.Blue),
         };
 
-        TablePerspective270 = new List<string>
+        TablePerspective270 = new List<Direction>
         {
-            "Right", "Down", "Up", "Down",
-            "Down", "Left", "Down", "Right",
-            "Left", "Up", "Right", "Left",
-            "Up", "Right", "Left", "Up",
+            Direction.Right, Direction.Down, Direction.Up, Direction.Down,
+            Direction.Down, Direction.Left, Direction.Down, Direction.Right,
+            Direction.Left, Direction.Up, Direction.Right, Direction.Left,
+            Direction.Up, Direction.Right, Direction.Left, Direction.Up,
         };
 
         TableColors270 = new List<Material>
         {
-            CubeColors[7], CubeColors[5], CubeColors[7], CubeColors[2],
-            CubeColors[6], CubeColors[0], CubeColors[1], CubeColors[4],
-            CubeColors[2], CubeColors[4], CubeColors[3], CubeColors[6],
-            CubeColors[3], CubeColors[1], CubeColors[5], CubeColors[0],
+            M(CubeColor.White), M(CubeColor.Magenta), M(CubeColor.White), M(CubeColor.Green),
+            M(CubeColor.Yellow), M(CubeColor.Black), M(CubeColor.Red), M(CubeColor.Cyan),
+            M(CubeColor.Green), M(CubeColor.Cyan), M(CubeColor.Blue), M(CubeColor.Yellow),
+            M(CubeColor.Blue), M(CubeColor.Red), M(CubeColor.Magenta), M(CubeColor.Black),
         };
 
         #endregion
@@ -266,25 +292,30 @@ public class ColorfulPerspective : MonoBehaviour
             }
         }
         if (matchingColorIndex != -1) CurrentFacePerspective = TablePerspective0[matchingColorIndex];
-        else CurrentFacePerspective = "Front";
+        else CurrentFacePerspective = Direction.Front;
         GetCurrentPerspectiveColors();
         Debug.LogFormat("[Colorful Perspective #{0}] Starting Perspective {1}", ModuleId, CurrentFacePerspective);
     }
 
     void GetStartingColor()
     {
+        Func<CubeColor, Material> M = delegate (CubeColor c)
+        {
+            return (CubeColors[(int)c]);
+        };
+
         int col = 0;
         int row = 0;
         Dictionary<int, Material> StartColorDict = new Dictionary<int, Material>
         {
-            { 11, CubeColors[2] },
-            { 12, CubeColors[0] },
-            { 13, CubeColors[3] },
-            { 14, CubeColors[7] },
-            { 21, CubeColors[1] },
-            { 22, CubeColors[4] },
-            { 23, CubeColors[6] },
-            { 24, CubeColors[5] },
+            { 11, M(CubeColor.Green) },
+            { 12, M(CubeColor.Black) },
+            { 13, M(CubeColor.Blue) },
+            { 14, M(CubeColor.White) },
+            { 21, M(CubeColor.Red) },
+            { 22, M(CubeColor.Cyan) },
+            { 23, M(CubeColor.Yellow) },
+            { 24, M(CubeColor.Magenta) },
         };
 
         if (BatteryHolder <= 1)
@@ -304,7 +335,7 @@ public class ColorfulPerspective : MonoBehaviour
             col = 4;
         }
 
-        if (ThirdAndSixthSerialNumberDigit < 10)
+        if (ThirdAndSixthSerialNumberDigit <= 10)
         {
             row = 1;
         }
@@ -325,19 +356,19 @@ public class ColorfulPerspective : MonoBehaviour
     {
         switch (CurrentFacePerspective)
         {
-            case "Left":
+            case Direction.Left:
                 GetFaceLeft();
                 break;
-            case "Down":
+            case Direction.Down:
                 GetFaceDown();
                 break;
-            case "Front":
+            case Direction.Front:
                 GetFaceFront();
                 break;
-            case "Up":
+            case Direction.Up:
                 GetFaceUp();
                 break;
-            case "Right":
+            case Direction.Right:
                 GetFaceRight();
                 break;
         }
@@ -494,40 +525,46 @@ public class ColorfulPerspective : MonoBehaviour
 
     void HandleColorAndPerspectiveChange()
     {
-        RGB NextColor = new RGB((int)CurrentColor.color.r == 1, (int)CurrentColor.color.g == 1, (int)CurrentColor.color.b == 1);
+        Func<float, bool> IsOne = delegate (float value)
+        {
+            return value > 0.5f;
+        };
+
+        RGB NextColor = new RGB(IsOne(CurrentColor.color.r), IsOne(CurrentColor.color.g), IsOne(CurrentColor.color.b));
 
         foreach (int index in CurrentPressedCubeIndexList)
         {
             if (CurrentTableRotation == 0)
             {
-                if ((int)TableColors0[index].color.r == 1) NextColor.r = !NextColor.r;
-                if ((int)TableColors0[index].color.g == 1) NextColor.g = !NextColor.g;
-                if ((int)TableColors0[index].color.b == 1) NextColor.b = !NextColor.b;
+                Debug.Log(TableColors0[index].color);
+                if (TableColors0[index].color.r == 1) NextColor.r = !NextColor.r;
+                if (TableColors0[index].color.g == 1) NextColor.g = !NextColor.g;
+                if (TableColors0[index].color.b == 1) NextColor.b = !NextColor.b;
                 NextFacePerspective = TablePerspective0[index];
             }
             else if (CurrentTableRotation == 1)
             {
-                if ((int)TableColors90[index].color.r == 1) NextColor.r = !NextColor.r;
-                if ((int)TableColors90[index].color.g == 1) NextColor.g = !NextColor.g;
-                if ((int)TableColors90[index].color.b == 1) NextColor.b = !NextColor.b;
+                if (TableColors90[index].color.r == 1) NextColor.r = !NextColor.r;
+                if (TableColors90[index].color.g == 1) NextColor.g = !NextColor.g;
+                if (TableColors90[index].color.b == 1) NextColor.b = !NextColor.b;
                 NextFacePerspective = TablePerspective90[index];
             }
             else if (CurrentTableRotation == 2)
             {
-                if ((int)TableColors180[index].color.r == 1) NextColor.r = !NextColor.r;
-                if ((int)TableColors180[index].color.g == 1) NextColor.g = !NextColor.g;
-                if ((int)TableColors180[index].color.b == 1) NextColor.b = !NextColor.b;
+                if (TableColors180[index].color.r == 1) NextColor.r = !NextColor.r;
+                if (TableColors180[index].color.g == 1) NextColor.g = !NextColor.g;
+                if (TableColors180[index].color.b == 1) NextColor.b = !NextColor.b;
                 NextFacePerspective = TablePerspective180[index];
             }
             else
             {
-                if ((int)TableColors270[index].color.r == 1) NextColor.r = !NextColor.r;
-                if ((int)TableColors270[index].color.g == 1) NextColor.g = !NextColor.g;
-                if ((int)TableColors270[index].color.b == 1) NextColor.b = !NextColor.b;
+                if (TableColors270[index].color.r == 1) NextColor.r = !NextColor.r;
+                if (TableColors270[index].color.g == 1) NextColor.g = !NextColor.g;
+                if (TableColors270[index].color.b == 1) NextColor.b = !NextColor.b;
                 NextFacePerspective = TablePerspective270[index];
             }
-            HandlePerspectiveChange();
         }
+        HandlePerspectiveChange();
 
         if (!IsCubeAmountPressedEven)
         {
@@ -558,38 +595,39 @@ public class ColorfulPerspective : MonoBehaviour
 
     void HandlePerspectiveChange()
     {
+        Debug.Log("sdfsregbesdbsbsdb");
         if (IsCubeAmountPressedEven)
         {
             switch (NextFacePerspective)
             {
-                case "Left":
-                    NextFacePerspective = "Right";
+                case Direction.Left:
+                    NextFacePerspective = Direction.Right;
                     break;
-                case "Right":
-                    NextFacePerspective = "Left";
+                case Direction.Right:
+                    NextFacePerspective = Direction.Left;
                     break;
-                case "Up":
-                    NextFacePerspective = "Down";
+                case Direction.Up:
+                    NextFacePerspective = Direction.Down;
                     break;
-                case "Down":
-                    NextFacePerspective = "Up";
+                case Direction.Down:
+                    NextFacePerspective = Direction.Up;
                     break;
             }
         }
 
-        Dictionary<string, string> DirectionTransitions = new Dictionary<string, string>
+        Dictionary<string, Direction> DirectionTransitions = new Dictionary<string, Direction>
         {
-            { "LeftLeft", "Right" },
-            { "LeftRight", "Front" },
-            { "RightLeft", "Front" },
-            { "RightRight", "Left" },
-            { "UpUp", "Down" },
-            { "UpDown", "Front" },
-            { "DownUp", "Front" },
-            { "DownDown", "Up" }
+            { "LeftLeft", Direction.Right },
+            { "LeftRight", Direction.Front },
+            { "RightLeft", Direction.Front },
+            { "RightRight", Direction.Left },
+            { "UpUp", Direction.Down },
+            { "UpDown", Direction.Front },
+            { "DownUp", Direction.Front },
+            { "DownDown", Direction.Up }
         };
 
-        string key = CurrentFacePerspective + NextFacePerspective;
+        string key = CurrentFacePerspective.ToString() + NextFacePerspective.ToString();
         if (key == "LeftLeft" || key == "RightRight" || key == "UpUp" || key == "DownDown")
         {
             if (IsCubeAmountPressedEven) CurrentTableRotation++; else CurrentTableRotation += 3;

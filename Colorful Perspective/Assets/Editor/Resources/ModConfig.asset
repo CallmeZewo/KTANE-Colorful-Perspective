@@ -19,6 +19,6 @@ MonoBehaviour:
 
 
     The manual can be found in the manuals folder of the game or at ktane.timwi.de.'
-  version: 1.0.1
+  version: 1.0.2
   outputFolder: build
   previewImage: {fileID: 2800000, guid: eb67d71d98298ae41b2452ea63d772da, type: 3}
