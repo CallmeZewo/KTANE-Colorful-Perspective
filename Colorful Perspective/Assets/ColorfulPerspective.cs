@@ -33,6 +33,8 @@ public class ColorfulPerspective : MonoBehaviour
     Direction CurrentFacePerspective;
     Direction NextFacePerspective;
 
+    List<Direction> DirectionsListForPrespectiveChange = new List<Direction>();
+
     Material CurrentColor;
 
     List<int> CurrentPressedCubeIndexList = new List<int>();
@@ -536,7 +538,6 @@ public class ColorfulPerspective : MonoBehaviour
         {
             if (CurrentTableRotation == 0)
             {
-                Debug.Log(TableColors0[index].color);
                 if (TableColors0[index].color.r == 1) NextColor.r = !NextColor.r;
                 if (TableColors0[index].color.g == 1) NextColor.g = !NextColor.g;
                 if (TableColors0[index].color.b == 1) NextColor.b = !NextColor.b;
@@ -563,8 +564,8 @@ public class ColorfulPerspective : MonoBehaviour
                 if (TableColors270[index].color.b == 1) NextColor.b = !NextColor.b;
                 NextFacePerspective = TablePerspective270[index];
             }
+            DirectionsListForPrespectiveChange.Add(NextFacePerspective);
         }
-        HandlePerspectiveChange();
 
         if (!IsCubeAmountPressedEven)
         {
@@ -587,30 +588,36 @@ public class ColorfulPerspective : MonoBehaviour
 
         int key = (NextColor.r ? 100 : 0) + (NextColor.g ? 10 : 0) + (NextColor.b ? 1 : 0);
         CurrentColor = CubeColors[lookupTableNewColor[key]];
+
+        foreach (Direction dir in DirectionsListForPrespectiveChange)
+        {
+            HandlePerspectiveChange(dir);
+        }
+        DirectionsListForPrespectiveChange.Clear();
+
         Debug.LogFormat("[Colorful Perspective #{0}] New Color is: {1}", ModuleId, CurrentColor.name);
         Debug.LogFormat("[Colorful Perspective #{0}] New Perspective is: {1}", ModuleId, CurrentFacePerspective);
 
         CurrentPressedCubeIndexList.Clear();
     }
 
-    void HandlePerspectiveChange()
+    void HandlePerspectiveChange(Direction nextDir)
     {
-        Debug.Log("sdfsregbesdbsbsdb");
         if (IsCubeAmountPressedEven)
         {
-            switch (NextFacePerspective)
+            switch (nextDir)
             {
                 case Direction.Left:
-                    NextFacePerspective = Direction.Right;
+                    nextDir = Direction.Right;
                     break;
                 case Direction.Right:
-                    NextFacePerspective = Direction.Left;
+                    nextDir = Direction.Left;
                     break;
                 case Direction.Up:
-                    NextFacePerspective = Direction.Down;
+                    nextDir = Direction.Down;
                     break;
                 case Direction.Down:
-                    NextFacePerspective = Direction.Up;
+                    nextDir = Direction.Up;
                     break;
             }
         }
@@ -627,7 +634,7 @@ public class ColorfulPerspective : MonoBehaviour
             { "DownDown", Direction.Up }
         };
 
-        string key = CurrentFacePerspective.ToString() + NextFacePerspective.ToString();
+        string key = CurrentFacePerspective.ToString() + nextDir.ToString();
         if (key == "LeftLeft" || key == "RightRight" || key == "UpUp" || key == "DownDown")
         {
             if (IsCubeAmountPressedEven) CurrentTableRotation++; else CurrentTableRotation += 3;
@@ -638,7 +645,7 @@ public class ColorfulPerspective : MonoBehaviour
         }
         else
         {
-            CurrentFacePerspective = NextFacePerspective;
+            CurrentFacePerspective = nextDir;
         }
     }
 
